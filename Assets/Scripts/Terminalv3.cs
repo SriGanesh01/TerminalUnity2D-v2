@@ -18,6 +18,7 @@ public class Terminalv3 : MonoBehaviour
     [SerializeField] RectTransform targetRectTransform;
     [SerializeField] RectTransform toAdjustRectTransform;
     [SerializeField] RectTransform DirName;
+    // Hi
     public List<string> inputArray;
     public List<string> outputArray = new List<string>();
     public List<string> cmdList = new List<string>();
