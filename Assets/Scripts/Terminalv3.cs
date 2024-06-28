@@ -1,12 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using System.Linq;
 using UnityEngine.UI;
-using Unity.VisualScripting;
-using System.IO;
 
 public class Terminalv3 : MonoBehaviour
 {
@@ -18,14 +13,14 @@ public class Terminalv3 : MonoBehaviour
     [SerializeField] RectTransform targetRectTransform;
     [SerializeField] RectTransform toAdjustRectTransform;
     [SerializeField] RectTransform DirName;
-    // Hi
     public List<string> inputArray;
     public List<string> outputArray = new List<string>();
     public List<string> cmdList = new List<string>();
+    public bool Admin = false;
 
     [SerializeField] float minHeight = 2160f;
     [SerializeField] int i = 1;
-    public new string name = "Cat";
+    public new string name = "user";
     public int ListOfCommandsIndex;
 
     public Directory rootDirectory;
@@ -54,6 +49,7 @@ public class Terminalv3 : MonoBehaviour
     {
         // Update TextMeshPro text with username
         string username = name;
+        Admin = username == "Admin" ? true : false;
         TextMeshProUGUI[] textMeshPro = valueUserInput.GetComponentsInChildren<TextMeshProUGUI>();
         if (textMeshPro.Length > 0)
         {
@@ -142,6 +138,7 @@ public class Terminalv3 : MonoBehaviour
         if (currentDirectory.Subdirectories.ContainsKey(directoryName))
         {
             currentDirectory.Subdirectories.Remove(directoryName);
+            outputArray.Add($"Directory {directoryName} removed.");
         }
         else
         {
@@ -153,6 +150,7 @@ public class Terminalv3 : MonoBehaviour
         if (currentDirectory.Files.ContainsKey(fileName))
         {
             currentDirectory.Files.Remove(fileName);
+            outputArray.Add($"File {fileName} removed.");
         }
         else
         {
@@ -163,6 +161,7 @@ public class Terminalv3 : MonoBehaviour
     public void OpenFile(string fileName) {
         if (currentDirectory.Files.ContainsKey(fileName))
         {
+            outputArray.Add($"Contents of {fileName}:");
             outputArray.Add(currentDirectory.Files[fileName].Content);
         }
         else
@@ -219,13 +218,8 @@ public class Terminalv3 : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
         {
-            ExecuteCommand(userInput);
+            Printer(userInput);
         }
-    }
-
-    private void ExecuteCommand(string userInput)
-    {
-        Printer(userInput); 
     }
 
     private void Printer(string userInput)
@@ -249,7 +243,7 @@ public class Terminalv3 : MonoBehaviour
         {
             //+ Help Command
 
-            if (inputArray[0] == "Help" || inputArray[0] == "help") //Done
+            if (inputArray[0] == "Help" || inputArray[0] == "help" || inputArray[0] == "/Help" || inputArray[0] == "/help")
             {
                 outputArray.Clear();
                 outputArray.Add("You can type 'help' to get a list of commands."); //Just Print //Done
@@ -259,9 +253,9 @@ public class Terminalv3 : MonoBehaviour
                 outputArray.Add("You can type 'echo' to print text to the screen."); //Just Print //Done
                 outputArray.Add("You can type 'pwd' to print the current working directory."); //Just Print //Done
                 outputArray.Add("You can type 'mkdir' to create a new directory."); //Do Something //Need Admin Access //Rem for imp //Done //TODO Admin Access
-                outputArray.Add("You can type 'cp' to copy a file or directory."); //Do Something //Need Admin Access //TODO
-                outputArray.Add("You can type 'rm' to remove a file."); //Do Something //Need Admin Access //Done //TODO Admin Access
-                outputArray.Add("You can type 'rmdir' to remove a directory."); //Do Something //Need Admin Access //Done //TODO Admin Access
+                // outputArray.Add("You can type 'cp' to copy a file or directory."); //Do Something //Need Admin Access //TODO
+                outputArray.Add("You can type 'rm' to remove a file."); //Do Something //Need Admin Access //Done
+                outputArray.Add("You can type 'rmdir' to remove a directory."); //Do Something //Need Admin Access //Done
                 outputArray.Add("You can type 'touch' to create a new file."); //Do Something //Need Admin Access //Done //TODO Admin Access
                 outputArray.Add("You can type 'clear' to clear the screen."); //Do Something //Done
                 outputArray.Add("You can type 'exit' to exit the terminal."); //Do Something //Done
@@ -347,27 +341,15 @@ public class Terminalv3 : MonoBehaviour
                 outputArray.Add("touch: missing file content");
             }
 
-
-            //+ Clear Command
-
-            else if (inputArray[0] == "clear") //Done
-            {
-                ClearTerminal();
-            }
-
-            //+ Exit Command
-
-            else if (inputArray[0] == "exit") //Done
-            {
-                outputArray.Clear();
-                Application.Quit();
-            }
-
             //+ rm Command
 
-            else if (inputArray[0] == "rm" && inputArray.Count > 1) {
+            else if (inputArray[0] == "rm" && inputArray.Count > 1 && Admin) {
                 outputArray.Clear();
                 RemoveFile(inputArray[1]);
+            }
+            else if (inputArray[0] == "rm" && inputArray.Count > 1 && !Admin) {
+                outputArray.Clear();
+                outputArray.Add("rm: permission denied");
             }
             else if (inputArray[0] == "rm" && inputArray.Count <= 1) {
                 outputArray.Clear();
@@ -376,15 +358,35 @@ public class Terminalv3 : MonoBehaviour
 
             //+ rmdir Command
 
-            else if (inputArray[0] == "rmdir" && inputArray.Count > 1)
+            else if (inputArray[0] == "rmdir" && inputArray.Count > 1 && Admin)
             {
                 outputArray.Clear();
                 RemoveDirectory(inputArray[1]);
+            }
+            else if (inputArray[0] == "rmdir" && inputArray.Count > 1 && !Admin)
+            {
+                outputArray.Clear();
+                outputArray.Add("rmdir: permission denied");
             }
             else if (inputArray[0] == "rmdir" && inputArray.Count <= 1)
             {
                 outputArray.Clear();
                 outputArray.Add("rmdir: missing operand");
+            }
+
+            //+ Clear Command
+
+            else if (inputArray[0] == "clear")
+            {
+                ClearTerminal();
+            }
+
+            //+ Exit Command
+
+            else if (inputArray[0] == "exit")
+            {
+                outputArray.Clear();
+                Application.Quit();
             }
 
             //+ else
