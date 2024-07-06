@@ -27,10 +27,14 @@ public class Terminalv3 : MonoBehaviour
     public Directory currentDirectory;
     public Directory previousDirectory;
     public string currentPath;
+    public float startTime;
 
 
     void Start()
     {
+
+        startTime = Time.time;
+
         tmpInputField.onEndEdit.AddListener(HandleInputEndEdit);  //wtf is HandleInputEndEdit not a function?
         tmpInputField.Select();
         tmpInputField.ActivateInputField();
@@ -109,10 +113,11 @@ public class Terminalv3 : MonoBehaviour
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentPanel.GetComponent<RectTransform>());
         }
 
-        
+
     }
 
-    private void MakeInitialDirectorySystem() {
+    private void MakeInitialDirectorySystem()
+    {
         currentPath = "/";
         rootDirectory = new Directory(currentPath);
         currentDirectory = rootDirectory;
@@ -120,7 +125,7 @@ public class Terminalv3 : MonoBehaviour
 
         rootDirectory.Subdirectories["Home"] = new Directory("Home");
         rootDirectory.Subdirectories["Home"].Files["file1"] = new Files("file1", "This is file1.");
-        
+
     }
 
     public void CreateDirectory(string directoryName)
@@ -136,7 +141,20 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void RemoveDirectory(string directoryName) {
+    public void GetUptime()
+    {
+        float uptime = Time.time - startTime;
+
+        int hours = (int)(uptime / 3600);
+        int minutes = (int)((uptime % 3600) / 60);
+        int seconds = (int)(uptime % 60);
+
+        outputArray.Add($"Uptime: {hours} hours, {minutes} minutes, {seconds} seconds.");
+    }
+
+
+    public void RemoveDirectory(string directoryName)
+    {
         if (currentDirectory.Subdirectories.ContainsKey(directoryName))
         {
             currentDirectory.Subdirectories.Remove(directoryName);
@@ -148,7 +166,8 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void RemoveFile(string fileName) {
+    public void RemoveFile(string fileName)
+    {
         if (currentDirectory.Files.ContainsKey(fileName))
         {
             currentDirectory.Files.Remove(fileName);
@@ -160,7 +179,8 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void OpenFile(string fileName) {
+    public void OpenFile(string fileName)
+    {
         if (currentDirectory.Files.ContainsKey(fileName))
         {
             outputArray.Add($"Contents of {fileName}:");
@@ -209,13 +229,20 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void PrintWorkingDirectory() {
+    public void PrintWorkingDirectory()
+    {
         outputArray.Add("Path:");
         outputArray.Add(name + currentPath);
     }
 
-    public void ChangeUser(string nm) {
+    public void ChangeUser(string nm)
+    {
         name = nm;
+    }
+
+    public void whoami()
+    {
+        outputArray.Add(name);
     }
 
 
@@ -255,120 +282,201 @@ public class Terminalv3 : MonoBehaviour
 
         if (inputArray.Count > 0)
         {
+            // Help and Manual Commands
+
             //+ Help Command
 
-            if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray.Count <= 1)
+            if (inputArray[0] == "man" && inputArray.Count <= 1)
             {
                 outputArray.Clear();
-                outputArray.Add("You can type 'help' to get a list of commands."); //Just Print //Done
-                outputArray.Add("You can type 'help [name of the command]' to get a detailed working of that command."); //Just Print //Done
-                outputArray.Add("You can type 'cd' to change directories."); //Do Something //Done
-                outputArray.Add("You can type 'ls' to list the contents of a directory."); //Just Print //Rem for imp //Done
-                outputArray.Add("You can type 'cat' to read the contents of a file."); //Do Something //Some need Admin Access //Done //TODO Admin Access
-                outputArray.Add("You can type 'echo' to print text to the screen."); //Just Print //Done
-                outputArray.Add("You can type 'pwd' to print the current working directory."); //Just Print //Done
-                outputArray.Add("You can type 'mkdir' to create a new directory."); //Do Something //Need Admin Access //Rem for imp //Done //TODO Admin Access
-                // outputArray.Add("You can type 'cp' to copy a file or directory."); //Do Something //Need Admin Access //TODO
-                outputArray.Add("You can type 'rm' to remove a file."); //Do Something //Need Admin Access //Done
-                outputArray.Add("You can type 'rmdir' to remove a directory."); //Do Something //Need Admin Access //Done
-                outputArray.Add("You can type 'touch' to create a new file."); //Do Something //Need Admin Access //Done //TODO Admin Access
-                outputArray.Add("You can type 'clear' to clear the screen."); //Do Something //Done
-                outputArray.Add("You can type 'user' to change the username."); //Do Something //Done
-                outputArray.Add("You can type 'exit' to exit the terminal."); //Do Something //Done
+
+                // Help and Manual Commands
+                outputArray.Add("You can type 'help' to get a list of commands."); // Just Print // Done
+                outputArray.Add("You can type 'man [command]' to get a detailed working of [command]."); // Just Print // Done
+
+                // Navigation and Directory Commands
+                outputArray.Add("You can type 'pwd' to print the current working directory."); // Just Print // Done
+                outputArray.Add("You can type 'cd' to change directories."); // Do Something // Done
+                outputArray.Add("You can type 'ls' to list the contents of a directory."); // Just Print // Rem for imp // Done
+                outputArray.Add("You can type 'mkdir' to create a new directory."); // Do Something // Need Admin Access // Rem for imp // Done // TODO Admin Access
+                outputArray.Add("You can type 'rmdir' to remove a directory."); // Do Something // Need Admin Access // Done
+
+                // File Manipulation Commands
+                outputArray.Add("You can type 'touch' to create a new file."); // Do Something // Need Admin Access // Done // TODO Admin Access
+                outputArray.Add("You can type 'rm' to remove a file."); // Do Something // Need Admin Access // Done
+                outputArray.Add("You can type 'cat' to read the contents of a file."); // Do Something // Some need Admin Access // Done // TODO Admin Access
+                outputArray.Add("You can type 'echo' to print text to the screen."); // Just Print // Done
+
+                // Miscellaneous Commands
+                outputArray.Add("You can type 'clear' to clear the screen."); // Do Something // Done
+                outputArray.Add("You can type 'whoami' to print the current username."); // Just Print // Done
+                outputArray.Add("You can type 'date' to print the current date and time."); // Just Print // Done
+                outputArray.Add("You can type 'uptime' to print the time since the terminal started."); // Just Print // Done
+                outputArray.Add("You can type 'exit' to exit the terminal."); // Do Something // Done
+
+                // Other Commands // not actual linux commands
+                outputArray.Add("You can type 'user [name]' to change the username to [name]."); // Do Something // Done
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && (inputArray[1] == "help" || inputArray[1] == "/help")) {
+            //+ man Command
+
+            // Help and Manual Commands
+            
+            else if (inputArray[0] == "man" && inputArray[1] == "help")
+            {
                 outputArray.Clear();
                 outputArray.Add("help: help");
                 outputArray.Add("Print information about all the available commands.");
-                outputArray.Add("help: help [command]");
-                outputArray.Add("Print information about [command].");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "cd") {
+            else if (inputArray[0] == "man" && inputArray[1] == "man")
+            {
                 outputArray.Clear();
-                outputArray.Add("cd: cd [directory]");
-                outputArray.Add("Change the current directory to [directory].");
+                outputArray.Add("man: man [command]");
+                outputArray.Add("Print detailed information about [command].");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "ls") {
-                outputArray.Clear();
-                outputArray.Add("ls: ls");
-                outputArray.Add("List the contents of the current directory.");
-            }
+            // Navigation and Directory Commands
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "cat") {
-                outputArray.Clear();
-                outputArray.Add("cat: cat [file]");
-                outputArray.Add("Print the contents of [file].");
-            }
-
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "echo") {
-                outputArray.Clear();
-                outputArray.Add("echo: echo [text]");
-                outputArray.Add("Print [text] to the screen.");
-            }
-
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "pwd") {
+            else if (inputArray[0] == "man" && inputArray[1] == "pwd")
+            {
                 outputArray.Clear();
                 outputArray.Add("pwd: pwd");
                 outputArray.Add("Print the current working directory.");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "mkdir") {
+            else if (inputArray[0] == "man" && inputArray[1] == "cd")
+            {
+                outputArray.Clear();
+                outputArray.Add("cd: cd [directory]");
+                outputArray.Add("Change the current directory to [directory].");
+            }
+
+            else if (inputArray[0] == "man" && inputArray[1] == "ls")
+            {
+                outputArray.Clear();
+                outputArray.Add("ls: ls");
+                outputArray.Add("List the contents of the current directory.");
+            }
+
+            else if (inputArray[0] == "man" && inputArray[1] == "mkdir")
+            {
                 outputArray.Clear();
                 outputArray.Add("mkdir: mkdir [directory]");
                 outputArray.Add("Create a new directory named [directory].");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "rm") {
-                outputArray.Clear();
-                outputArray.Add("rm: rm [file]");
-                outputArray.Add("Remove the file named [file].");
-            }
-
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "rmdir") {
+            else if (inputArray[0] == "man" && inputArray[1] == "rmdir")
+            {
                 outputArray.Clear();
                 outputArray.Add("rmdir: rmdir [directory]");
                 outputArray.Add("Remove the directory named [directory].");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "touch") {
+            // File Manipulation Commands
+
+            else if (inputArray[0] == "man" && inputArray[1] == "touch")
+            {
                 outputArray.Clear();
                 outputArray.Add("touch: touch [file] [content]");
                 outputArray.Add("Create a new file named [file] with [content].");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "clear") {
+            else if (inputArray[0] == "man" && inputArray[1] == "rm")
+            {
+                outputArray.Clear();
+                outputArray.Add("rm: rm [file]");
+                outputArray.Add("Remove the file named [file].");
+            }
+
+            else if (inputArray[0] == "man" && inputArray[1] == "cat")
+            {
+                outputArray.Clear();
+                outputArray.Add("cat: cat [file]");
+                outputArray.Add("Print the contents of [file].");
+            }
+
+            else if (inputArray[0] == "man" && inputArray[1] == "echo")
+            {
+                outputArray.Clear();
+                outputArray.Add("echo: echo [text]");
+                outputArray.Add("Print [text] to the screen.");
+            }
+
+            // Miscellaneous Commands
+
+            else if (inputArray[0] == "man" && inputArray[1] == "clear")
+            {
                 outputArray.Clear();
                 outputArray.Add("clear: clear");
                 outputArray.Add("Clear the screen.");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "user") {
+            else if (inputArray[0] == "man" && inputArray[1] == "whoami")
+            {
                 outputArray.Clear();
-                outputArray.Add("user: user [name]");
-                outputArray.Add("Change the username to [name].");
+                outputArray.Add("whoami: whoami");
+                outputArray.Add("Print the current username.");
             }
 
-            else if ((inputArray[0] == "help" || inputArray[0] == "/help") && inputArray[1] == "exit") {
+            else if (inputArray[0] == "man" && inputArray[1] == "date")
+            {
+                outputArray.Clear();
+                outputArray.Add("date: date");
+                outputArray.Add("Print the current date and time.");
+            }
+
+            else if (inputArray[0] == "man" && inputArray[1] == "uptime")
+            {
+                outputArray.Clear();
+                outputArray.Add("uptime: uptime");
+                outputArray.Add("Print the time since the terminal started.");
+            }
+
+            else if (inputArray[0] == "man" && inputArray[1] == "exit")
+            {
                 outputArray.Clear();
                 outputArray.Add("exit: exit");
                 outputArray.Add("Exit the terminal.");
             }
 
-            //+ Echo Command
+            // Other Commands // not actual linux commands
 
-            else if (inputArray[0] == "echo" && inputArray.Count > 1)
+            else if (inputArray[0] == "man" && inputArray[1] == "user")
             {
                 outputArray.Clear();
-                outputArray.Add(inputArray[1]);
+                outputArray.Add("user: user [name]");
+                outputArray.Add("Change the username to [name].");
             }
 
-            else if (inputArray[0] == "echo" && inputArray.Count <= 1)
+
+            // Navigation and Directory Commands
+
+            //+ Pwd Command
+
+            else if (inputArray[0] == "pwd")
             {
                 outputArray.Clear();
-                outputArray.Add("echo: missing operand");
+                PrintWorkingDirectory();
+            }
+
+            //+ Cd Command
+
+            else if (inputArray[0] == "cd" && inputArray.Count > 1)
+            {
+                outputArray.Clear();
+                ChangeDirectory(inputArray[1]);
+            }
+            else if (inputArray[0] == "cd" && inputArray.Count <= 1)
+            {
+                outputArray.Clear();
+                outputArray.Add("cd: missing operand");
+            }
+            else if (inputArray[0] == "cd" && inputArray[1] == "..")
+            {
+                outputArray.Clear();
+
+                ChangeDirectory("..");
             }
 
             //+ LS Command
@@ -392,71 +500,6 @@ public class Terminalv3 : MonoBehaviour
                 outputArray.Add("mkdir: missing operand");
             }
 
-            //+ Cd Command
-
-            else if (inputArray[0] == "cd" && inputArray.Count > 1) {
-                outputArray.Clear();
-                ChangeDirectory(inputArray[1]);
-            }
-            else if (inputArray[0] == "cd" && inputArray.Count <= 1) {
-                outputArray.Clear();
-                outputArray.Add("cd: missing operand");
-            }
-            else if (inputArray[0] == "cd" && inputArray[1] == "..") {
-                outputArray.Clear();
-                
-                ChangeDirectory("..");
-            }
-
-            //+ Pwd Command
-
-            else if (inputArray[0] == "pwd") {
-                outputArray.Clear();
-                PrintWorkingDirectory();
-            }
-
-            //+ Cat Command
-
-            else if (inputArray[0] == "cat" && inputArray.Count > 1) {
-                outputArray.Clear();
-                OpenFile(inputArray[1]);
-            }
-            else if (inputArray[0] == "cat" && inputArray.Count <= 1) {
-                outputArray.Clear();
-                outputArray.Add("cat: missing operand");
-            }
-
-            //+ Touch Command
-
-            else if (inputArray[0] == "touch" && inputArray.Count > 2) {
-                outputArray.Clear();
-                string fileContent = string.Join(" ", inputArray.GetRange(2, inputArray.Count - 2));
-                currentDirectory.Files[inputArray[1]] = new Files(inputArray[1], fileContent);
-            }
-            else if (inputArray[0] == "touch" && inputArray.Count <= 1) {
-                outputArray.Clear();
-                outputArray.Add("touch: missing operand");
-            }
-            else if (inputArray[0] == "touch" && inputArray.Count <= 2) {
-                outputArray.Clear();
-                outputArray.Add("touch: missing file content");
-            }
-
-            //+ rm Command
-
-            else if (inputArray[0] == "rm" && inputArray.Count > 1 && Admin) {
-                outputArray.Clear();
-                RemoveFile(inputArray[1]);
-            }
-            else if (inputArray[0] == "rm" && inputArray.Count > 1 && !Admin) {
-                outputArray.Clear();
-                outputArray.Add("rm: permission denied");
-            }
-            else if (inputArray[0] == "rm" && inputArray.Count <= 1) {
-                outputArray.Clear();
-                outputArray.Add("rm: missing operand");
-            }
-
             //+ rmdir Command
 
             else if (inputArray[0] == "rmdir" && inputArray.Count > 1 && Admin)
@@ -475,11 +518,107 @@ public class Terminalv3 : MonoBehaviour
                 outputArray.Add("rmdir: missing operand");
             }
 
+            // File Manipulation Commands
+
+            //+ Touch Command
+
+            else if (inputArray[0] == "touch" && inputArray.Count > 2)
+            {
+                outputArray.Clear();
+                string fileContent = string.Join(" ", inputArray.GetRange(2, inputArray.Count - 2));
+                currentDirectory.Files[inputArray[1]] = new Files(inputArray[1], fileContent);
+            }
+            else if (inputArray[0] == "touch" && inputArray.Count <= 1)
+            {
+                outputArray.Clear();
+                outputArray.Add("touch: missing operand");
+            }
+            else if (inputArray[0] == "touch" && inputArray.Count <= 2)
+            {
+                outputArray.Clear();
+                outputArray.Add("touch: missing file content");
+            }
+
+            //+ rm Command
+
+            else if (inputArray[0] == "rm" && inputArray.Count > 1 && Admin)
+            {
+                outputArray.Clear();
+                RemoveFile(inputArray[1]);
+            }
+            else if (inputArray[0] == "rm" && inputArray.Count > 1 && !Admin)
+            {
+                outputArray.Clear();
+                outputArray.Add("rm: permission denied");
+            }
+            else if (inputArray[0] == "rm" && inputArray.Count <= 1)
+            {
+                outputArray.Clear();
+                outputArray.Add("rm: missing operand");
+            }
+
+            //+ Cat Command
+
+            else if (inputArray[0] == "cat" && inputArray.Count > 1)
+            {
+                outputArray.Clear();
+                OpenFile(inputArray[1]);
+            }
+            else if (inputArray[0] == "cat" && inputArray.Count <= 1)
+            {
+                outputArray.Clear();
+                outputArray.Add("cat: missing operand");
+            }
+
+            //+ Echo Command
+
+            else if (inputArray[0] == "echo" && inputArray.Count > 1)
+            {
+                outputArray.Clear();
+                outputArray.Add(inputArray[1]);
+            }
+
+            else if (inputArray[0] == "echo" && inputArray.Count <= 1)
+            {
+                outputArray.Clear();
+                outputArray.Add("echo: missing operand");
+            }
+
+            // Miscellaneous Commands
+
             //+ Clear Command
 
             else if (inputArray[0] == "clear")
             {
                 ClearTerminal();
+            }
+            else if (inputArray[0] == "cls")
+            {
+                ClearTerminal();
+            }
+
+            //+ Whoami Command
+
+            else if (inputArray[0] == "whoami")
+            {
+                outputArray.Clear();
+                whoami();
+            }
+
+            //+ date Command
+
+            else if (inputArray[0] == "date")
+            {
+                outputArray.Clear();
+                outputArray.Add(System.DateTime.Now.ToString());
+            }
+
+            //+ uptime Command
+
+            else if (inputArray[0] == "uptime")
+            {
+                outputArray.Clear();
+                GetUptime();
             }
 
             //+ Exit Command
@@ -490,22 +629,24 @@ public class Terminalv3 : MonoBehaviour
                 Application.Quit();
             }
 
-            //+ Other Commands
+            // Other Commands // not actual linux commands
 
             //+ Change Username Command
 
-            else if (inputArray[0] == "user" && inputArray.Count > 1) {
+            else if (inputArray[0] == "user" && inputArray.Count > 1)
+            {
                 outputArray.Clear();
                 ChangeUser(inputArray[1]);
             }
 
-            else if (inputArray[0] == "user" && inputArray.Count <= 1) {
+            else if (inputArray[0] == "user" && inputArray.Count <= 1)
+            {
                 outputArray.Clear();
                 outputArray.Add("user: missing operand");
             }
 
             //+ else
-            
+
             else
             {
                 outputArray.Clear();
