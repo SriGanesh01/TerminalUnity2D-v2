@@ -22,8 +22,11 @@ public class Terminalv3 : MonoBehaviour
     public bool Admin = false; // Flag indicating admin privileges
 
     [SerializeField] float minHeight = 2160f; // Minimum height for adjustments
+    [SerializeField] float minWidth = 3840f; // Minimum width for adjustments
+    
     [SerializeField] int i = 1; // Index variable
     public new string name = "user"; // Username
+    public string permission = "Admin"; // Permission level
     public int ListOfCommandsIndex; // Index for list of commands
 
     // Directories and Paths
@@ -59,9 +62,10 @@ public class Terminalv3 : MonoBehaviour
 
     void Update()
     {
+
         // Update TextMeshPro text with username
         string username = name;
-        Admin = username == "Admin" ? true : false;
+        Admin = permission == "Admin" ? true : false;
         TextMeshProUGUI[] textMeshPro = valueUserInput.GetComponentsInChildren<TextMeshProUGUI>();
         if (textMeshPro.Length > 0)
         {
@@ -119,6 +123,12 @@ public class Terminalv3 : MonoBehaviour
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentPanel.GetComponent<RectTransform>());
         }
+
+        if (name == "Admin")
+        {
+            permission = "Admin";
+        }
+
 
 
     }
@@ -288,6 +298,12 @@ public class Terminalv3 : MonoBehaviour
             outputArray.Clear();
             outputArray.Add("user: user [name]");
             outputArray.Add("Change the username to [name].");
+        }
+
+        else
+        {
+            outputArray.Clear();
+            outputArray.Add($"No manual entry for {inputArray[1]}.");
         }
     }
 
@@ -671,12 +687,16 @@ public class Terminalv3 : MonoBehaviour
 
             //+ Change Username Command
 
-            else if (inputArray[0] == "user" && inputArray.Count > 1)
+            else if (inputArray[0] == "user" && inputArray.Count > 1 && Admin)
             {
                 outputArray.Clear();
                 ChangeUser(inputArray[1]);
             }
-
+            else if (inputArray[0] == "user" && inputArray.Count > 1 && !Admin)
+            {
+                outputArray.Clear();
+                outputArray.Add("user: permission denied");
+            }
             else if (inputArray[0] == "user" && inputArray.Count <= 1)
             {
                 outputArray.Clear();
@@ -728,7 +748,7 @@ public class Terminalv3 : MonoBehaviour
     {
         float targetY = targetRectTransform.anchoredPosition.y;
         float newHeight = Mathf.Max(minHeight, -targetY + 60f);
-        toAdjustRectTransform.anchoredPosition = new Vector2(toAdjustRectTransform.anchoredPosition.x, (newHeight + 60) / 2);
+        toAdjustRectTransform.anchoredPosition = new Vector2(toAdjustRectTransform.anchoredPosition.x, (newHeight) );
 
         valueUserInput.transform.SetAsLastSibling();
 
