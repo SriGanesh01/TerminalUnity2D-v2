@@ -31,6 +31,7 @@ public class Terminalv3 : MonoBehaviour
     public Directory currentDirectory; // Current working directory
     public Directory previousDirectory; // Previous directory
     public string currentPath; // Current directory path
+    public string previousPath; // Previous directory path
 
     // Other Variables
     public float startTime; // Start time for terminal session
@@ -54,6 +55,7 @@ public class Terminalv3 : MonoBehaviour
         }
 
         MakeInitialDirectorySystem();
+
     }
 
     void Update()
@@ -297,9 +299,8 @@ public class Terminalv3 : MonoBehaviour
         currentDirectory = rootDirectory;
         previousDirectory = rootDirectory;
 
-        rootDirectory.Subdirectories["Home"] = new Directory("Home");
+        rootDirectory.Subdirectories["Home"] = new Directory("Home", rootDirectory);
         rootDirectory.Subdirectories["Home"].Files["file1"] = new Files("file1", "This is file1.");
-
     }
 
     public void CreateDirectory(string directoryName)
@@ -310,7 +311,7 @@ public class Terminalv3 : MonoBehaviour
         }
         else
         {
-            currentDirectory.Subdirectories[directoryName] = new Directory(directoryName);
+            currentDirectory.Subdirectories[directoryName] = new Directory(directoryName, currentDirectory);
             outputArray.Add($"Directory '{directoryName}' created.");
         }
     }
@@ -367,25 +368,39 @@ public class Terminalv3 : MonoBehaviour
 
     public void ChangeDirectory(string path)
     {
-        if (currentDirectory.Subdirectories.ContainsKey(path))
+        if (path == "..")
         {
-            previousDirectory = currentDirectory;
-            currentDirectory = currentDirectory.Subdirectories[path];
-            currentPath += path + "/";
+            if (currentDirectory != rootDirectory)
+            {
+                currentDirectory = currentDirectory.ParentDirectory;
+                currentPath = currentPath.Substring(0, currentPath.LastIndexOf('/'));
+                if (currentPath == "")
+                {
+                    currentPath = "/";
+                }
+            }
+            else
+            {
+                outputArray.Add("You are already at the root directory.");
+            }
         }
-        else if (path == "..")
+        else if (currentDirectory.Subdirectories.ContainsKey(path))
         {
-            currentDirectory = previousDirectory;
-            currentPath = currentPath.Substring(0, currentPath.Length - previousDirectory.Name.Length - 1);
-            // currentDirectory = previousDirectory;
-            // currentPath = currentPath.Substring(0, currentPath.Length - currentDirectory.Name.Length - 1);
+            currentDirectory = currentDirectory.Subdirectories[path];
+            currentPath = currentPath == "/" ? $"/{path}" : $"{currentPath}/{path}";
         }
         else
         {
             outputArray.Add($"Directory {path} does not exist.");
         }
     }
-
+    
+    public void PrintWorkingDirectory()
+    {
+        outputArray.Add("Path:");
+        outputArray.Add(name + currentPath);
+    }
+    
     public void ListDirectory()
     {
         // outputArray.Add("Contents of directory:");
@@ -399,12 +414,6 @@ public class Terminalv3 : MonoBehaviour
         {
             outputArray.Add($"  {fileName.Key}");
         }
-    }
-
-    public void PrintWorkingDirectory()
-    {
-        outputArray.Add("Path:");
-        outputArray.Add(name + currentPath);
     }
 
     public void ChangeUser(string nm)
