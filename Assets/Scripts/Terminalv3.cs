@@ -36,7 +36,6 @@ public class Terminalv3 : MonoBehaviour
     // Other Variables
     public float startTime; // Start time for terminal session
 
-
     void Start()
     {
 
@@ -292,80 +291,12 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    private void MakeInitialDirectorySystem()
+    public void PrintWorkingDirectory()
     {
-        currentPath = "/";
-        rootDirectory = new Directory(currentPath);
-        currentDirectory = rootDirectory;
-        previousDirectory = rootDirectory;
-
-        rootDirectory.Subdirectories["Home"] = new Directory("Home", rootDirectory);
-        rootDirectory.Subdirectories["Home"].Files["file1"] = new Files("file1", "This is file1.");
+        outputArray.Add("Path:");
+        outputArray.Add(name + currentPath);
     }
-
-    public void CreateDirectory(string directoryName)
-    {
-        if (currentDirectory.Subdirectories.ContainsKey(directoryName))
-        {
-            outputArray.Add($"Directory {directoryName} already exists.");
-        }
-        else
-        {
-            currentDirectory.Subdirectories[directoryName] = new Directory(directoryName, currentDirectory);
-            outputArray.Add($"Directory '{directoryName}' created.");
-        }
-    }
-
-    public void GetUptime()
-    {
-        float uptime = Time.time - startTime;
-
-        int hours = (int)(uptime / 3600);
-        int minutes = (int)((uptime % 3600) / 60);
-        int seconds = (int)(uptime % 60);
-
-        outputArray.Add($"Uptime: {hours} hours, {minutes} minutes, {seconds} seconds.");
-    }
-
-    public void RemoveDirectory(string directoryName)
-    {
-        if (currentDirectory.Subdirectories.ContainsKey(directoryName))
-        {
-            currentDirectory.Subdirectories.Remove(directoryName);
-            outputArray.Add($"Directory {directoryName} removed.");
-        }
-        else
-        {
-            outputArray.Add($"Directory {directoryName} does not exist.");
-        }
-    }
-
-    public void RemoveFile(string fileName)
-    {
-        if (currentDirectory.Files.ContainsKey(fileName))
-        {
-            currentDirectory.Files.Remove(fileName);
-            outputArray.Add($"File {fileName} removed.");
-        }
-        else
-        {
-            outputArray.Add($"File {fileName} does not exist.");
-        }
-    }
-
-    public void OpenFile(string fileName)
-    {
-        if (currentDirectory.Files.ContainsKey(fileName))
-        {
-            outputArray.Add($"Contents of {fileName}:");
-            outputArray.Add(currentDirectory.Files[fileName].Content);
-        }
-        else
-        {
-            outputArray.Add($"File {fileName} does not exist.");
-        }
-    }
-
+    
     public void ChangeDirectory(string path)
     {
         if (path == "..")
@@ -395,12 +326,6 @@ public class Terminalv3 : MonoBehaviour
         }
     }
     
-    public void PrintWorkingDirectory()
-    {
-        outputArray.Add("Path:");
-        outputArray.Add(name + currentPath);
-    }
-    
     public void ListDirectory()
     {
         // outputArray.Add("Contents of directory:");
@@ -416,14 +341,65 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void ChangeUser(string nm)
+    public void CreateDirectory(string directoryName)
     {
-        name = nm;
+        if (currentDirectory.Subdirectories.ContainsKey(directoryName))
+        {
+            outputArray.Add($"Directory {directoryName} already exists.");
+        }
+        else
+        {
+            currentDirectory.Subdirectories[directoryName] = new Directory(directoryName, currentDirectory);
+            outputArray.Add($"Directory '{directoryName}' created.");
+        }
     }
 
-    public void whoami()
+    public void RemoveDirectory(string directoryName)
     {
-        outputArray.Add(name);
+        if (currentDirectory.Subdirectories.ContainsKey(directoryName))
+        {
+            currentDirectory.Subdirectories.Remove(directoryName);
+            outputArray.Add($"Directory {directoryName} removed.");
+        }
+        else
+        {
+            outputArray.Add($"Directory {directoryName} does not exist.");
+        }
+    }
+
+    public void TouchCommand() {
+        string fileContent = string.Join(" ", inputArray.GetRange(2, inputArray.Count - 2));
+        currentDirectory.Files[inputArray[1]] = new Files(inputArray[1], fileContent);
+    }
+
+    public void RemoveFile(string fileName)
+    {
+        if (currentDirectory.Files.ContainsKey(fileName))
+        {
+            currentDirectory.Files.Remove(fileName);
+            outputArray.Add($"File {fileName} removed.");
+        }
+        else
+        {
+            outputArray.Add($"File {fileName} does not exist.");
+        }
+    }
+
+    public void OpenFile(string fileName)
+    {
+        if (currentDirectory.Files.ContainsKey(fileName))
+        {
+            outputArray.Add($"Contents of {fileName}:");
+            outputArray.Add(currentDirectory.Files[fileName].Content);
+        }
+        else
+        {
+            outputArray.Add($"File {fileName} does not exist.");
+        }
+    }
+
+    public void EchoCommand() {
+        outputArray.Add(inputArray[1]);
     }
 
     private void ClearTerminal()
@@ -443,6 +419,37 @@ public class Terminalv3 : MonoBehaviour
 
         // Adjust the height after clearing
         AdjustHeight();
+    }
+
+    public void whoami()
+    {
+        outputArray.Add(name);
+    }
+
+    public void GetDate()
+    {
+        outputArray.Add(System.DateTime.Now.ToString());
+    }
+
+    public void GetUptime()
+    {
+        float uptime = Time.time - startTime;
+
+        int hours = (int)(uptime / 3600);
+        int minutes = (int)((uptime % 3600) / 60);
+        int seconds = (int)(uptime % 60);
+
+        outputArray.Add($"Uptime: {hours} hours, {minutes} minutes, {seconds} seconds.");
+    }
+
+    public void ExitTerminal()
+    {
+        Application.Quit();
+    }
+
+    public void ChangeUser(string nm)
+    {
+        name = nm;
     }
 
     private void Printer(string userInput)
@@ -557,8 +564,7 @@ public class Terminalv3 : MonoBehaviour
             else if (inputArray[0] == "touch" && inputArray.Count > 2)
             {
                 outputArray.Clear();
-                string fileContent = string.Join(" ", inputArray.GetRange(2, inputArray.Count - 2));
-                currentDirectory.Files[inputArray[1]] = new Files(inputArray[1], fileContent);
+                TouchCommand();
             }
             else if (inputArray[0] == "touch" && inputArray.Count <= 1)
             {
@@ -607,7 +613,7 @@ public class Terminalv3 : MonoBehaviour
             else if (inputArray[0] == "echo" && inputArray.Count > 1)
             {
                 outputArray.Clear();
-                outputArray.Add(inputArray[1]);
+                EchoCommand();
             }
 
             else if (inputArray[0] == "echo" && inputArray.Count <= 1)
@@ -642,7 +648,7 @@ public class Terminalv3 : MonoBehaviour
             else if (inputArray[0] == "date")
             {
                 outputArray.Clear();
-                outputArray.Add(System.DateTime.Now.ToString());
+                GetDate();
             }
 
             //+ uptime Command
@@ -658,7 +664,7 @@ public class Terminalv3 : MonoBehaviour
             else if (inputArray[0] == "exit")
             {
                 outputArray.Clear();
-                Application.Quit();
+                ExitTerminal();
             }
 
             // Other Commands // not actual linux commands
@@ -697,6 +703,17 @@ public class Terminalv3 : MonoBehaviour
         }
 
         AdjustHeight();
+    }
+
+    private void MakeInitialDirectorySystem()
+    {
+        currentPath = "/";
+        rootDirectory = new Directory(currentPath);
+        currentDirectory = rootDirectory;
+        previousDirectory = rootDirectory;
+
+        rootDirectory.Subdirectories["Home"] = new Directory("Home", rootDirectory);
+        rootDirectory.Subdirectories["Home"].Files["file1"] = new Files("file1", "This is file1.");
     }
 
     private void HandleInputEndEdit(string userInput)
