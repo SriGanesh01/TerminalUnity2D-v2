@@ -22,7 +22,6 @@ public class Terminalv3 : MonoBehaviour
     public bool Admin = false; // Flag indicating admin privileges
 
     [SerializeField] float minHeight = 2160f; // Minimum height for adjustments
-    [SerializeField] float minWidth = 3840f; // Minimum width for adjustments
     
     [SerializeField] int i = 1; // Index variable
     public new string name = "user"; // Username
@@ -34,7 +33,6 @@ public class Terminalv3 : MonoBehaviour
     public Directory currentDirectory; // Current working directory
     public Directory previousDirectory; // Previous directory
     public string currentPath; // Current directory path
-    public string previousPath; // Previous directory path
 
     // Other Variables
     public float startTime; // Start time for terminal session
