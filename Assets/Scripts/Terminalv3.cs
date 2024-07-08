@@ -381,7 +381,8 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void TouchCommand() {
+    public void TouchCommand()
+    {
         string fileContent = string.Join(" ", inputArray.GetRange(2, inputArray.Count - 2));
         currentDirectory.Files[inputArray[1]] = new Files(inputArray[1], fileContent);
     }
@@ -412,7 +413,8 @@ public class Terminalv3 : MonoBehaviour
         }
     }
 
-    public void EchoCommand() {
+    public void EchoCommand()
+    {
         outputArray.Add(inputArray[1]);
     }
 
