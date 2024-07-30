@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace DirectoryAndFiles
+namespace Terminal.DirectoryAndFiles
 {
     public class Directory
     {

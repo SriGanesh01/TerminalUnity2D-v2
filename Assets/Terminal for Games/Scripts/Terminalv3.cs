@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-namespace Terminal
+namespace Terminal.terminal
 {
     public class Terminalv3 : MonoBehaviour
     {

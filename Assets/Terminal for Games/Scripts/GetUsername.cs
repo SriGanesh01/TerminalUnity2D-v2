@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace username
+namespace Terminal.username
 {
     public class GetUsername : MonoBehaviour
     {
         [SerializeField] private Canvas canvasLogin;
         [SerializeField] private GameObject canvasTerminal;
-        public Terminal.Terminalv3 terminal;
+        public Terminal.terminal.Terminalv3 terminal;
         public string username;
 
         // Start is called before the first frame update

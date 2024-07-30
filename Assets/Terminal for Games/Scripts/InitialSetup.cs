@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace initsetup
+namespace Terminal.initsetup
 {
     public class InitialSetup : MonoBehaviour
     {
