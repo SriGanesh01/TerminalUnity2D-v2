@@ -1,12 +1,44 @@
-This package provides you with a completely working terminal-like interface. If your game needs a working terminal to be a part the computers, this can help you do that. It is also easy to add custom commands to the source code.
+This is a try to make a terminal emulator like thing. This was initially indented to work as an asset in Unity Asset Store, but this should work as a standalone app too. 
 
-It is also extremely easy to add custom commands to to change the variables in the game like player speed or player position during runtime without leaving the game view. It has implemented Admin access meaning, you can restrict certain commands from certain users.
 
-You can contact me if you want custom commands to affect various game variables during runtime. Depending upon the scale of the request, i can do it either for no or a small fee.
 
-You can also add it yourself. It is as easy as adding a function and if else in the terminalv3.cs file.
+This has the following commands implemented:
+help
+man
+pwd
+cd
+ls
+mkdir
+rmdir
+touch
+rm
+cat
+echo
+clear
+whoami
+date
+uptime
+user (to change user. For admin access ans stuff. name it "Admin" for admin access. "user" for no admin access)
+exit (Works only in the unity game, exits the game)
 
-I will be adding more and more commands to closely resemble working on a linux terminal or any command line interface along with fun and useful custom commands.
+NOTE that (I forgot, I'll come back to it)
+
+all the logic is in the file "Terminalv3.cs". The file Directory implements the "Directory.cs" system.
+Most of the command logic is under the function Printer in "Terminalv3.cs"
+
+Commands i am working on (Currently)
+The filter system thing (What is the technical name for it?) like ls -l or ls - a.
+file editing. (can only create the file with the text. Building a texteditor kind of layout)
+
+Future plans
+I/O Redirections
+Piping
+A custom programing language (Hopefully)
+
+Long Term Idea
+To build a working UI (Like an working OS) on top of this terminal system.
+
+NOTE: Due to some error/problem with the .gitignore, I had ro delete the Terminalv1. everything imported to Terminalv2 now.
 
 Images
 
