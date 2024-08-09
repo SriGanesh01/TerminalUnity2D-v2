@@ -18,7 +18,7 @@ namespace Terminal.DirectoryAndFiles
         }
     }
 
-    public class Files
+    public class Files 
     {
         public string Name { get; set; }
         public string Content { get; set; }
